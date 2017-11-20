@@ -114,7 +114,7 @@ class File implements ModelInterface
 
     public function getPath($withFileName = true)
     {
-        $prefix = mb_substr($this->prefix, 0, 1) . '/' . $this->prefix;
+        $prefix = mb_substr($this->getPrefix(), 0, 1) . '/' . $this->getPrefix();
         $dir = $prefix . '/' . $this->uploadedAt->format('Y/m/d/');
         return $withFileName ? ($dir . $this->getInternalName(true)) : $dir;
     }
@@ -127,6 +127,11 @@ class File implements ModelInterface
     public static function createFromUploaded(UploadedFileInterface $file, string $prefix = null): self
     {
         return new self($file->getClientFilename(), $file->getSize(), $file->getClientMediaType(), $prefix);
+    }
+
+    protected function getPrefix(): string
+    {
+        return $this->prefix;
     }
 
     private function getExtensionWithDot(): string

@@ -171,12 +171,6 @@ class File implements ModelInterface
         return $this->downloads;
     }
 
-    public static function createFromUploaded(UploadedFileInterface $file, string $storage, string $pathPrefix = '', $tag = ''): self
-    {
-        $fileDTO = new FileDTO($file->getClientFilename(), $file->getSize(), $file->getClientMediaType());
-        return new self($fileDTO, $storage, $pathPrefix, $tag);
-    }
-
     protected function getPathPrefix(): string
     {
         return $this->pathPrefix;
@@ -185,6 +179,11 @@ class File implements ModelInterface
     private function getExtensionWithDot(): string
     {
         return empty($this->extension) ? '' : ".{$this->extension}";
+    }
+
+    public static function uploadedFileInterfaceToFileDTO(UploadedFileInterface $file): FileDTO
+    {
+        return new FileDTO($file->getClientFilename(), $file->getSize(), $file->getClientMediaType());
     }
 
 }

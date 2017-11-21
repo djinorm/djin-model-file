@@ -127,7 +127,7 @@ class FileTest extends TestCase
         $this->assertEquals(0, $this->file->getDownloads());
     }
 
-    public function testCreateFromUploaded()
+    public function testUploadedFileInterfaceToFileDTO()
     {
         /** @var UploadedFileInterface $uploaded */
         $uploaded = $this->createMock(UploadedFileInterface::class);
@@ -135,10 +135,10 @@ class FileTest extends TestCase
         $uploaded->method('getSize')->willReturn(2048);
         $uploaded->method('getClientMediaType')->willReturn('image/jpeg');
 
-        $file = File::createFromUploaded($uploaded, 'local');
-        $this->assertEquals('image.jpg', $file->getClientFileName(true));
-        $this->assertEquals(2048, $file->getSize());
-        $this->assertEquals('image/jpeg', $file->getMime());
+        $expected = new FileDTO('image.jpg', 2048, 'image/jpeg');
+        $actual = File::uploadedFileInterfaceToFileDTO($uploaded);
+
+        $this->assertEquals($expected, $actual);
     }
 
 }

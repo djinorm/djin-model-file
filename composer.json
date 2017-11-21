@@ -25,5 +25,8 @@
         "psr-4": {
             "DjinORM\\Models\\": "tests/"
         }
+    },
+    "suggest": {
+        "league/flysystem": "Flysystem is a filesystem abstraction which allows you to easily swap out a local filesystem for a remote one"
     }
 }

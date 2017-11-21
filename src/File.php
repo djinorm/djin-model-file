@@ -159,10 +159,10 @@ class File implements ModelInterface
     {
         $prefix = $this->getPathPrefix();
         if (!empty($prefix)) {
-            $prefix = '/' . mb_substr($prefix, 0, 1) . '/' . $prefix;
+            $prefix = mb_substr($prefix, 0, 1) . '/' . $prefix . '/';
         }
 
-        $dir = $prefix . $this->uploadedAt->format('/Y/m/d/');
+        $dir = $prefix . $this->uploadedAt->format('Y/m/d/');
         return $withFileName ? ($dir . $this->getInternalName(true)) : $dir;
     }
 

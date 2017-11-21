@@ -29,7 +29,11 @@ class FileTest extends TestCase
     public function testConstructEmptyPrefixAndTag()
     {
         $file = new File($this->fileDTO, 'local');
-        $this->assertRegExp('~^\/\d{4}\/\d{2}\/\d{2}\/~', $file->getPath());
+
+        $path = $file->getUploadedAt()->format('Y/m/d/');
+        $this->assertEquals($path . $file->getInternalName(true), $file->getPath(true));
+        $this->assertEquals($path, $file->getPath(false));
+
         $this->assertEmpty($file->getTag());
     }
 
@@ -113,7 +117,7 @@ class FileTest extends TestCase
 
     public function testGetPath()
     {
-        $path = '/q/qwerty/' . $this->file->getUploadedAt()->format('Y/m/d/');
+        $path = 'q/qwerty/' . $this->file->getUploadedAt()->format('Y/m/d/');
         $this->assertEquals($path . $this->file->getInternalName(true), $this->file->getPath(true));
         $this->assertEquals($path, $this->file->getPath(false));
     }

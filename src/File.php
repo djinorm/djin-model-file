@@ -24,7 +24,7 @@ class File implements ModelInterface
     protected $id;
 
     /** @var string */
-    protected $prefix;
+    protected $pathPrefix;
 
     /** @var DateTimeImmutable */
     protected $uploadedAt;
@@ -41,29 +41,41 @@ class File implements ModelInterface
     /** @var int */
     protected $size;
 
+    /** @var string */
+    protected $storage;
+
+    /** @var string */
+    protected $entityType = '';
+
+    /** @var Id */
+    protected $entityId;
+
+    /** @var string */
+    protected $tag;
+
     /** @var int */
     protected $downloads = 0;
 
-    public function __construct(string $fileName, int $fileSizeInBytes, string $mime = null, string $prefix = null)
+    public function __construct(FileDTO $file, string $storage, string $pathPrefix = '', $tag = '')
     {
-        if (is_null($prefix) || $prefix == '') {
-            $prefix = rand(1,999);
-        }
-
         $this->id = new Id(UuidGenerator::generate());
         $this->uploadedAt = new DateTimeImmutable();
-        $this->prefix = $prefix;
-        $this->mime = $mime;
+
+        $this->storage = $storage;
+        $this->pathPrefix = $pathPrefix;
+        $this->tag = $tag;
 
         $fileNameParts = [];
-        if (preg_match('~(.+)\.([^\.]+)$~', $fileName, $fileNameParts)) {
+        if (preg_match('~(.+)\.([^\.]+)$~', $file->name, $fileNameParts)) {
             $this->clientFileName = $fileNameParts[1];
             $this->extension = mb_strtolower($fileNameParts[2]);
         } else {
-            $this->clientFileName = $fileName;
+            $this->clientFileName = $file->name;
         }
 
-        $this->size = $fileSizeInBytes;
+        $this->size = $file->size;
+        $this->mime = $file->mime;
+
     }
 
     public function getUploadedAt()
@@ -104,6 +116,37 @@ class File implements ModelInterface
         return $this->mime;
     }
 
+    public function getStorage(): string
+    {
+        return $this->storage;
+    }
+
+    public function setStorage(string $storage)
+    {
+        $this->storage = $storage;
+    }
+
+    public function getEntityType(): string
+    {
+        return $this->entityType;
+    }
+
+    public function getEntityId(): ?Id
+    {
+        return $this->entityId;
+    }
+
+    public function setEntity(string $type, Id $id)
+    {
+        $this->entityType = $type;
+        $this->entityId = $id;
+    }
+
+    public function getTag(): string
+    {
+        return $this->tag;
+    }
+
     public function getInternalName($withExtension = true)
     {
         if ($withExtension) {
@@ -114,8 +157,12 @@ class File implements ModelInterface
 
     public function getPath($withFileName = true)
     {
-        $prefix = mb_substr($this->getPrefix(), 0, 1) . '/' . $this->getPrefix();
-        $dir = $prefix . '/' . $this->uploadedAt->format('Y/m/d/');
+        $prefix = $this->getPathPrefix();
+        if (!empty($prefix)) {
+            $prefix = '/' . mb_substr($prefix, 0, 1) . '/' . $prefix;
+        }
+
+        $dir = $prefix . $this->uploadedAt->format('/Y/m/d/');
         return $withFileName ? ($dir . $this->getInternalName(true)) : $dir;
     }
 
@@ -124,14 +171,15 @@ class File implements ModelInterface
         return $this->downloads;
     }
 
-    public static function createFromUploaded(UploadedFileInterface $file, string $prefix = null): self
+    public static function createFromUploaded(UploadedFileInterface $file, string $storage, string $pathPrefix = '', $tag = ''): self
     {
-        return new self($file->getClientFilename(), $file->getSize(), $file->getClientMediaType(), $prefix);
+        $fileDTO = new FileDTO($file->getClientFilename(), $file->getSize(), $file->getClientMediaType());
+        return new self($fileDTO, $storage, $pathPrefix, $tag);
     }
 
-    protected function getPrefix(): string
+    protected function getPathPrefix(): string
     {
-        return $this->prefix;
+        return $this->pathPrefix;
     }
 
     private function getExtensionWithDot(): string

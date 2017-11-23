@@ -5,11 +5,10 @@
  * @author Timur Kasumov aka XAKEPEHOK
  */
 
-namespace DjinORM\Models;
+namespace DjinORM\Models\File;
 
 use DjinORM\Djin\Id\Id;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\UploadedFileInterface;
 
 class FileTest extends TestCase
 {
@@ -125,20 +124,6 @@ class FileTest extends TestCase
     public function testGetDownloads()
     {
         $this->assertEquals(0, $this->file->getDownloads());
-    }
-
-    public function testUploadedFileInterfaceToFileDTO()
-    {
-        /** @var UploadedFileInterface $uploaded */
-        $uploaded = $this->createMock(UploadedFileInterface::class);
-        $uploaded->method('getClientFilename')->willReturn('image.jpg');
-        $uploaded->method('getSize')->willReturn(2048);
-        $uploaded->method('getClientMediaType')->willReturn('image/jpeg');
-
-        $expected = new FileDTO('image.jpg', 2048, 'image/jpeg');
-        $actual = File::uploadedFileInterfaceToFileDTO($uploaded);
-
-        $this->assertEquals($expected, $actual);
     }
 
 }

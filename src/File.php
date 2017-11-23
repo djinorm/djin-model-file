@@ -5,7 +5,7 @@
  * @author Timur Kasumov aka XAKEPEHOK
  */
 
-namespace DjinORM\Models;
+namespace DjinORM\Models\File;
 
 
 use DateTimeImmutable;
@@ -13,7 +13,6 @@ use DjinORM\Djin\Id\Id;
 use DjinORM\Djin\Id\UuidGenerator;
 use DjinORM\Djin\Model\ModelInterface;
 use DjinORM\Djin\Model\ModelTrait;
-use Psr\Http\Message\UploadedFileInterface;
 
 class File implements ModelInterface
 {
@@ -179,11 +178,6 @@ class File implements ModelInterface
     private function getExtensionWithDot(): string
     {
         return empty($this->extension) ? '' : ".{$this->extension}";
-    }
-
-    public static function uploadedFileInterfaceToFileDTO(UploadedFileInterface $file): FileDTO
-    {
-        return new FileDTO($file->getClientFilename(), $file->getSize(), $file->getClientMediaType());
     }
 
 }

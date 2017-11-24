@@ -120,6 +120,19 @@ class FileTest extends TestCase
         $this->assertEquals(new Id(1), $this->file->getEntityId());
     }
 
+    /**
+     * @depends testSetEntity()
+     */
+    public function setNullEntity()
+    {
+        $this->assertEquals('user', $this->file->getEntityType());
+        $this->assertEquals(new Id(1), $this->file->getEntityId());
+
+        $this->file->setEntity(null);
+        $this->assertEquals('', $this->file->getEntityType());
+        $this->assertNull($this->file->getEntityId());
+    }
+
     public function testGetTag()
     {
         $this->assertEquals('image_500', $this->file->getTag());

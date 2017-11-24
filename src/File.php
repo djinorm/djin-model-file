@@ -135,10 +135,18 @@ class File implements ModelInterface
         return $this->entityId;
     }
 
-    public function setEntity(ModelInterface $model)
+    /**
+     * @param ModelInterface|null $model
+     */
+    public function setEntity(?ModelInterface $model)
     {
-        $this->entityType = $model::getModelName();
-        $this->entityId = $model->getId();
+        if ($model === null) {
+            $this->entityType = '';
+            $this->entityId = null;
+        } else {
+            $this->entityType = $model::getModelName();
+            $this->entityId = $model->getId();
+        }
     }
 
     public function getTag(): string

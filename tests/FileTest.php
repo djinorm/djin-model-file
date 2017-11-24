@@ -8,6 +8,8 @@
 namespace DjinORM\Models\File;
 
 use DjinORM\Djin\Id\Id;
+use DjinORM\Djin\Model\ModelInterface;
+use DjinORM\Djin\Model\ModelTrait;
 use PHPUnit\Framework\TestCase;
 
 class FileTest extends TestCase
@@ -97,10 +99,25 @@ class FileTest extends TestCase
 
     public function testSetEntity()
     {
-        $id = new Id();
-        $this->file->setEntity('user', $id);
+        $model = new class() implements ModelInterface {
+            use ModelTrait;
+
+            protected $id;
+
+            public function __construct()
+            {
+                $this->id = new Id(1);
+            }
+
+            public static function getModelName(): string
+            {
+                return 'user';
+            }
+        };
+
+        $this->file->setEntity($model);
         $this->assertEquals('user', $this->file->getEntityType());
-        $this->assertEquals($id, $this->file->getEntityId());
+        $this->assertEquals(new Id(1), $this->file->getEntityId());
     }
 
     public function testGetTag()

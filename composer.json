@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "djinorm/djin": "^2.6",
+        "djinorm/djin": "<4",
         "psr/http-message": "^1.0"
     },
     "require-dev": {

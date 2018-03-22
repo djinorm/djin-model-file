@@ -50,19 +50,22 @@ class File implements ModelInterface
     protected $entityId;
 
     /** @var string */
-    protected $tag;
+    protected $variation;
+
+    /** @var string */
+    protected $tag = '';
 
     /** @var int */
     protected $downloads = 0;
 
-    public function __construct(FileDTO $file, string $storage, string $pathPrefix = '', $tag = '')
+    public function __construct(FileDTO $file, string $storage, string $pathPrefix = '', $variation = '')
     {
         $this->id = new Id(UuidGenerator::generate());
         $this->uploadedAt = new DateTimeImmutable();
 
         $this->storage = $storage;
         $this->pathPrefix = $pathPrefix;
-        $this->tag = $tag;
+        $this->variation = $variation;
 
         $fileNameParts = [];
         if (preg_match('~(.+)\.([^\.]+)$~', $file->name, $fileNameParts)) {
@@ -95,7 +98,7 @@ class File implements ModelInterface
     }
 
     /**
-     * @return string
+     * @return string file extension without dot
      */
     public function getExtension(): string
     {
@@ -103,18 +106,24 @@ class File implements ModelInterface
     }
 
     /**
-     * @return int размер файла в байтах
+     * @return int file size in bytes
      */
     public function getSize(): int
     {
         return $this->size;
     }
 
+    /**
+     * @return string mime type
+     */
     public function getMime()
     {
         return $this->mime;
     }
 
+    /**
+     * @return string storage name
+     */
     public function getStorage(): string
     {
         return $this->storage;
@@ -136,22 +145,43 @@ class File implements ModelInterface
     }
 
     /**
-     * @param ModelInterface|null $model
+     * @param ModelInterface $model
+     * @throws FileAlreadyHasEntityException
      */
-    public function setEntity(?ModelInterface $model)
+    public function setEntity(ModelInterface $model)
     {
-        if ($model === null) {
-            $this->entityType = '';
-            $this->entityId = null;
-        } else {
-            $this->entityType = $model::getModelName();
-            $this->entityId = $model->getId();
-        }
+        $this->guardAlreadyHasEntity($model);
+        $this->entityType = $model::getModelName();
+        $this->entityId = $model->getId();
     }
 
+    public function removeEntity()
+    {
+        $this->entityType = '';
+        $this->entityId = null;
+    }
+
+    /**
+     * For example, it can be 'image_500', 'image_1200' etc, for different image sizes, or contain file version
+     * @return string
+     */
+    public function getVariation(): string
+    {
+        return $this->variation;
+    }
+
+    /**
+     * Helper for filtering files
+     * @return string
+     */
     public function getTag(): string
     {
         return $this->tag;
+    }
+
+    public function setTag(string $tag)
+    {
+        $this->tag = $tag;
     }
 
     public function getInternalName($withExtension = true)
@@ -186,6 +216,20 @@ class File implements ModelInterface
     private function getExtensionWithDot(): string
     {
         return empty($this->extension) ? '' : ".{$this->extension}";
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @throws FileAlreadyHasEntityException
+     */
+    private function guardAlreadyHasEntity(ModelInterface $model)
+    {
+        $sameType = $this->entityType === $model::getModelName();
+        $sameId = $model->getId()->isEqual($this->entityId);
+        $same = $sameType && $sameId;
+        if (!$same && $this->entityId) {
+            throw new FileAlreadyHasEntityException("EntityType: {$this->entityType}, Id: {$this->entityId->toScalar()}");
+        }
     }
 
 }

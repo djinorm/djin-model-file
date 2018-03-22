@@ -21,10 +21,48 @@ class FileTest extends TestCase
     /** @var FileDTO */
     private $fileDTO;
 
+    /** @var ModelInterface */
+    private $model_1;
+
+    /** @var ModelInterface */
+    private $model_2;
+
     public function setUp()
     {
         $this->fileDTO = new FileDTO('image.jpg', 1024, 'image/jpeg');
         $this->file = new File($this->fileDTO, 'local', 'qwerty', 'image_500');
+
+        $this->model_1 = new class() implements ModelInterface {
+            use ModelTrait;
+
+            protected $id;
+
+            public function __construct()
+            {
+                $this->id = new Id(1);
+            }
+
+            public static function getModelName(): string
+            {
+                return 'user';
+            }
+        };
+
+        $this->model_2 = new class() implements ModelInterface {
+            use ModelTrait;
+
+            protected $id;
+
+            public function __construct()
+            {
+                $this->id = new Id(2);
+            }
+
+            public static function getModelName(): string
+            {
+                return 'user';
+            }
+        };
     }
 
     public function testConstructEmptyPrefixAndTag()
@@ -97,45 +135,61 @@ class FileTest extends TestCase
         $this->assertNull($this->file->getEntityId());
     }
 
+    /**
+     * @throws FileAlreadyHasEntityException
+     */
     public function testSetEntity()
     {
-        $model = new class() implements ModelInterface {
-            use ModelTrait;
-
-            protected $id;
-
-            public function __construct()
-            {
-                $this->id = new Id(1);
-            }
-
-            public static function getModelName(): string
-            {
-                return 'user';
-            }
-        };
-
-        $this->file->setEntity($model);
+        $this->file->setEntity($this->model_1);
         $this->assertEquals('user', $this->file->getEntityType());
         $this->assertEquals(new Id(1), $this->file->getEntityId());
     }
 
     /**
-     * @depends testSetEntity()
+     * @throws FileAlreadyHasEntityException
      */
-    public function setNullEntity()
+    public function testSetSameEntity()
     {
+        $this->file->setEntity($this->model_1);
+        $this->file->setEntity($this->model_1);
         $this->assertEquals('user', $this->file->getEntityType());
         $this->assertEquals(new Id(1), $this->file->getEntityId());
+    }
 
-        $this->file->setEntity(null);
-        $this->assertEquals('', $this->file->getEntityType());
+    /**
+     * @throws FileAlreadyHasEntityException
+     */
+    public function testSetNotSameEntity()
+    {
+        $this->expectException(FileAlreadyHasEntityException::class);
+        $this->file->setEntity($this->model_1);
+        $this->file->setEntity($this->model_2);
+    }
+
+    /**
+     * @throws FileAlreadyHasEntityException
+     */
+    public function testRemoveEntity()
+    {
+        $this->file->setEntity($this->model_1);
+        $this->file->removeEntity();
         $this->assertNull($this->file->getEntityId());
+    }
+
+    public function testGetVariation()
+    {
+        $this->assertEquals('image_500', $this->file->getVariation());
     }
 
     public function testGetTag()
     {
-        $this->assertEquals('image_500', $this->file->getTag());
+        $this->assertEquals('', $this->file->getTag());
+    }
+
+    public function testSetTag()
+    {
+        $this->file->setTag('hello world');
+        $this->assertEquals('hello world', $this->file->getTag());
     }
 
     public function testGetInternalFileName()

@@ -17,6 +17,9 @@ use DjinORM\Djin\Model\ModelTrait;
 class File implements ModelInterface
 {
 
+    const TYPE_BINARY = 'binary';
+    const TYPE_IMAGE = 'image';
+
     use ModelTrait;
 
     /** @var Id */
@@ -50,6 +53,9 @@ class File implements ModelInterface
     protected $entityId;
 
     /** @var string */
+    protected $type;
+
+    /** @var string */
     protected $variation;
 
     /** @var string */
@@ -58,14 +64,15 @@ class File implements ModelInterface
     /** @var int */
     protected $downloads = 0;
 
-    public function __construct(FileDTO $file, string $storage, string $pathPrefix = '', $variation = '')
+    public function __construct(FileDTO $file, string $entityType, string $storage, string $pathPrefix = '')
     {
         $this->id = new Id(UuidGenerator::generate());
         $this->uploadedAt = new DateTimeImmutable();
 
+        $this->entityType = $entityType;
+
         $this->storage = $storage;
         $this->pathPrefix = $pathPrefix;
-        $this->variation = $variation;
 
         $fileNameParts = [];
         if (preg_match('~(.+)\.([^\.]+)$~', $file->name, $fileNameParts)) {
@@ -78,6 +85,9 @@ class File implements ModelInterface
         $this->size = $file->size;
         $this->mime = $file->mime;
 
+
+        $this->variation = $file->variation;
+        $this->type = $file->type;
     }
 
     public function getUploadedAt()
@@ -144,6 +154,11 @@ class File implements ModelInterface
         return $this->entityId;
     }
 
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
     /**
      * @param ModelInterface $model
      * @throws FileAlreadyHasEntityException
@@ -151,13 +166,11 @@ class File implements ModelInterface
     public function setEntity(ModelInterface $model)
     {
         $this->guardAlreadyHasEntity($model);
-        $this->entityType = $model::getModelName();
         $this->entityId = $model->getId();
     }
 
     public function removeEntity()
     {
-        $this->entityType = '';
         $this->entityId = null;
     }
 

@@ -19,6 +19,12 @@ class FileDTO
     /** @var string */
     public $mime;
 
+    /** @var string */
+    public $variation = '';
+
+    /** @var string */
+    public $type = '';
+
     public function __construct(string $name, int $sizeInBytes, string $mime)
     {
         $this->name = $name;

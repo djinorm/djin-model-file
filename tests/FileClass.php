@@ -8,7 +8,7 @@
 namespace DjinORM\Models\File;
 
 
-class MyFile extends File
+class FileClass extends File
 {
 
     public static function getModelName(): string

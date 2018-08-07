@@ -64,6 +64,16 @@ class File implements ModelInterface
     /** @var int */
     protected $downloads = 0;
 
+    /**
+     * File constructor.
+     * @param FileDTO $file
+     * @param string $entityType
+     * @param string $storage
+     * @param string $pathPrefix
+     * @throws \DjinORM\Djin\Exceptions\InvalidArgumentException
+     * @throws \DjinORM\Djin\Exceptions\LogicException
+     * @throws \Exception
+     */
     public function __construct(FileDTO $file, string $entityType, string $storage, string $pathPrefix = '')
     {
         $this->id = new Id(UuidGenerator::generate());
@@ -243,6 +253,11 @@ class File implements ModelInterface
         if (!$same && $this->entityId) {
             throw new FileAlreadyHasEntityException("EntityType: {$this->entityType}, Id: {$this->entityId->toScalar()}");
         }
+    }
+
+    public static function getModelName(): string
+    {
+        return 'file';
     }
 
 }

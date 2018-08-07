@@ -7,16 +7,16 @@
 
 namespace DjinORM\Models\File;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UploadedFileInterface;
-use SebastianBergmann\GlobalState\RuntimeException;
 
 class FileDtoHelperTest extends TestCase
 {
 
     public function testUploadedFileInterfaceToFileDTO()
     {
-        /** @var UploadedFileInterface $uploaded */
+        /** @var UploadedFileInterface|MockObject $uploaded */
         $uploaded = $this->createMock(UploadedFileInterface::class);
         $uploaded->method('getClientFilename')->willReturn('image.jpg');
         $uploaded->method('getSize')->willReturn(2048);
@@ -36,7 +36,7 @@ class FileDtoHelperTest extends TestCase
 
     public function testLocalFileToFileDTONoFile()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         FileDtoHelper::localFileToFileDTO(__DIR__ . '/qwerty.txt');
     }
 

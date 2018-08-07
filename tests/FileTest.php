@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class FileTest extends TestCase
 {
 
-    /** @var File */
+    /** @var MyFile */
     private $file;
 
     /** @var FileDTO */
@@ -30,7 +30,7 @@ class FileTest extends TestCase
     public function setUp()
     {
         $this->fileDTO = new FileDTO('image.jpg', 1024, 'image/jpeg');
-        $this->fileDTO->type = File::TYPE_BINARY;
+        $this->fileDTO->type = MyFile::TYPE_BINARY;
         $this->fileDTO->variation = 'image_500';
 
         $this->model_1 = new class() implements ModelInterface {
@@ -65,12 +65,12 @@ class FileTest extends TestCase
             }
         };
 
-        $this->file = new File($this->fileDTO, $this->model_1::getModelName(), 'local', 'qwerty');
+        $this->file = new MyFile($this->fileDTO, $this->model_1::getModelName(), 'local', 'qwerty');
     }
 
     public function testConstructEmptyPrefixAndTag()
     {
-        $file = new File($this->fileDTO, $this->model_1::getModelName(), 'local');
+        $file = new MyFile($this->fileDTO, $this->model_1::getModelName(), 'local');
 
         $path = $file->getUploadedAt()->format('Y/m/d/');
         $this->assertEquals($path . $file->getInternalName(true), $file->getPath(true));
@@ -82,7 +82,7 @@ class FileTest extends TestCase
     public function testConstructFileWithoutExtension()
     {
         $this->fileDTO->name = 'image';
-        $file = new File($this->fileDTO, $this->model_1::getModelName(), 'local');
+        $file = new MyFile($this->fileDTO, $this->model_1::getModelName(), 'local');
         $this->assertEquals('image', $file->getClientFileName(true));
         $this->assertEquals('image', $file->getClientFileName(false));
         $this->assertEquals('', $file->getExtension());
@@ -181,7 +181,7 @@ class FileTest extends TestCase
 
     public function testGetType()
     {
-        $this->assertEquals(File::TYPE_BINARY, $this->file->getType());
+        $this->assertEquals(MyFile::TYPE_BINARY, $this->file->getType());
     }
 
     public function testGetVariation()

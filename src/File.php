@@ -14,7 +14,7 @@ use DjinORM\Djin\Id\UuidGenerator;
 use DjinORM\Djin\Model\ModelInterface;
 use DjinORM\Djin\Model\ModelTrait;
 
-class File implements ModelInterface
+abstract class File implements ModelInterface
 {
 
     const TYPE_BINARY = 'binary';
@@ -253,11 +253,6 @@ class File implements ModelInterface
         if (!$same && $this->entityId) {
             throw new FileAlreadyHasEntityException("EntityType: {$this->entityType}, Id: {$this->entityId->toScalar()}");
         }
-    }
-
-    public static function getModelName(): string
-    {
-        return 'file';
     }
 
 }

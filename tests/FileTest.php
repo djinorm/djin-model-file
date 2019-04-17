@@ -9,7 +9,6 @@ namespace DjinORM\Models\File;
 
 use DjinORM\Djin\Id\Id;
 use DjinORM\Djin\Model\ModelInterface;
-use DjinORM\Djin\Model\ModelTrait;
 use PHPUnit\Framework\TestCase;
 
 class FileTest extends TestCase
@@ -34,13 +33,20 @@ class FileTest extends TestCase
         $this->fileDTO->variation = 'image_500';
 
         $this->model_1 = new class() implements ModelInterface {
-            use ModelTrait;
 
             protected $id;
 
             public function __construct()
             {
                 $this->id = new Id(1);
+            }
+
+            /**
+             * @return Id
+             */
+            public function getId(): Id
+            {
+                return $this->id;
             }
 
             public static function getModelName(): string
@@ -50,13 +56,20 @@ class FileTest extends TestCase
         };
 
         $this->model_2 = new class() implements ModelInterface {
-            use ModelTrait;
 
             protected $id;
 
             public function __construct()
             {
                 $this->id = new Id(2);
+            }
+
+            /**
+             * @return Id
+             */
+            public function getId(): Id
+            {
+                return $this->id;
             }
 
             public static function getModelName(): string

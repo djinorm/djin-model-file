@@ -9,18 +9,18 @@ namespace DjinORM\Models\File;
 
 
 use DateTimeImmutable;
+use DjinORM\Djin\Exceptions\InvalidArgumentException;
+use DjinORM\Djin\Exceptions\LogicException;
 use DjinORM\Djin\Id\Id;
 use DjinORM\Djin\Id\UuidGenerator;
 use DjinORM\Djin\Model\ModelInterface;
-use DjinORM\Djin\Model\ModelTrait;
+use Exception;
 
 abstract class File implements ModelInterface
 {
 
     const TYPE_BINARY = 'binary';
     const TYPE_IMAGE = 'image';
-
-    use ModelTrait;
 
     /** @var Id */
     protected $id;
@@ -70,9 +70,9 @@ abstract class File implements ModelInterface
      * @param string $entityType
      * @param string $storage
      * @param string $pathPrefix
-     * @throws \DjinORM\Djin\Exceptions\InvalidArgumentException
-     * @throws \DjinORM\Djin\Exceptions\LogicException
-     * @throws \Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws Exception
      */
     public function __construct(FileDTO $file, string $entityType, string $storage, string $pathPrefix = '')
     {
@@ -98,6 +98,14 @@ abstract class File implements ModelInterface
 
         $this->variation = $file->variation;
         $this->type = $file->type;
+    }
+
+    /**
+     * @return Id
+     */
+    public function getId(): Id
+    {
+        return $this->id;
     }
 
     public function getUploadedAt()
